@@ -554,7 +554,7 @@ namespace Harbor
         /// (Checking only the focused window made the bar reappear over a fullscreen video
         /// as soon as you clicked something on your other screen.)
         /// </summary>
-        static void CheckFullscreen()
+        public static void CheckFullscreen()
         {
             fsDecided = new Dictionary<IntPtr, bool>();
             fsLeft = Displays.Count;
@@ -567,6 +567,7 @@ namespace Harbor
                 d.Fullscreen = full;
                 d.Bar.SetHidden(full);
                 if (d.DockWanted) d.Dock.SetHidden(full);
+                if (d == PrimaryDisplay) Island.FullscreenChanged(full);
             }
         }
 

@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+**Games stay uncovered**
+- **Claude Code's questions wait while a game or video is fullscreen.** A permission request used to spring the notch open over the game, and it stayed there until you answered. Now it waits, and it folds away if the game goes fullscreen while it's open. Once the main screen is back, the island pops up with the question. Claude Code's own prompt works throughout.
+
+
 ## 0.4.1 — 2026-11-08 (preview)
 
 **Less memory**

@@ -174,13 +174,38 @@ namespace Harbor
             if (FocusField != null) { Activate(); N.SetForegroundWindow(Handle); }
         }
 
-        /// <summary>Claude Code is asking permission: pop the island up on the AI tab of the main screen.</summary>
+        static bool heldForFullscreen; // Claude asked while a game or video filled the main screen
+
+        /// <summary>
+        /// Claude Code is asking permission: pop the island up on the AI tab of the main screen.
+        /// Not over a fullscreen game or video, though: then it pops up once that screen is back.
+        /// </summary>
         public static void Attention()
         {
+            App.CheckFullscreen(); // switching to a game calls this before the debounced check has seen it
             var d = App.PrimaryDisplay;
+            if (d != null && d.Fullscreen) { heldForFullscreen = true; return; }
+            Pop(d);
+        }
+
+        static void Pop(Display d)
+        {
             if (d == null || d.Bar == null || !d.Bar.IsHandleCreated) return;
             var sb = d.Bar.ScreenBounds;
             Open(d.Bar, new RectangleF(sb.Width / 2f - 120, 0, 240, sb.Height), "ai");
+        }
+
+        /// <summary>The main screen went fullscreen or came back: a question from Claude folds away, then returns.</summary>
+        public static void FullscreenChanged(bool full)
+        {
+            if (full)
+            {
+                if (inst != null && inst.Visible && ClaudeBridge.Pending.Count > 0) { heldForFullscreen = true; inst.Shrink(); }
+                return;
+            }
+            if (!heldForFullscreen) return;
+            heldForFullscreen = false;
+            if (ClaudeBridge.Pending.Exists(r => !r.Done && !r.Deferred)) Pop(App.PrimaryDisplay);
         }
 
         // ------------------------------------------------------------------ layout
